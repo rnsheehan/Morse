@@ -13,12 +13,14 @@ import sys
 import os
 import glob
 import re
+import math
+import numpy
 
 #import scipy # apparently cannot install scipy on raspberry pi
 #import matplotlib # apparently cannot install matplotlib on raspberry p
 
-import math
-import numpy
+# import required modules
+import morse_tx
 
 def main():
     pass
@@ -33,6 +35,4 @@ if __name__ == '__main__':
 
     str_input = input('Enter a string to transmit:')
 
-    str_input = str_input.upper() # conver the string to all uppercase
-
-    print("You entered: %(v1)s"%{"v1":str_input})
+    morse_tx.convert_to_morse(str_input)
