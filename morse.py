@@ -35,4 +35,12 @@ if __name__ == '__main__':
 
     str_input = input('Enter a string to transmit:')
 
-    morse_tx.convert_to_morse(str_input)
+    #morse_tx.convert_to_morse(str_input)
+
+    # need to convert string to an array of words
+    # split string using spaces
+    print(str_input.split(' '))
+    # need to convert word to an array of letters
+    # split words using list
+    print("\n")
+    print(list(str_input))
