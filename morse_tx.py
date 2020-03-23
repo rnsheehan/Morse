@@ -4,6 +4,12 @@
 # en.wikipedia.org/wiki/Morse_Code
 # www.wikihow.com/Learn-Morse-Code
 
+import sys
+import re
+
+#sys.path.append('~/Programming/Python/Common/')
+#import Common
+
 MOD_NAME_STR = "morse_tx"
 
 # need a dictionary to convert from alpha-numeric character to morse character
@@ -19,7 +25,7 @@ morse_code = {"A":"dit-dah", "B":"dah-dit-dit-dit","C":"dah-dit-dah-dit","D":"da
 
 
 # methods to enable the conversion
-def convert_to_morse(str_input):
+def convert_to_morse(str_input, loud = False):
     # method that converts a string to morse code
     
     FUNC_NAME = ".convert_to_morse()"
@@ -28,8 +34,18 @@ def convert_to_morse(str_input):
     try:
 
         if str_input is not None:
-            str_input = str_input.upper()
             print("Input string to be converted: %(v1)s"%{"v1":str_input})
+            str_input = re.sub(r'[^\w]', '', str_input) # remove all non alpha-numeric characters from input
+            str_list = list(str_input.upper()) # convert the input string to a list of upper case letters
+            if loud: print(str_list)
+            # translate the list to Morse
+            morse_list = []
+            for i in range(0, len(str_list), 1):
+                if str_list[i] in morse_code:
+                    entry = morse_code[str_list[i]]
+                    morse_list.append(entry)
+                    if loud: print(entry)
+            return morse_list
         else:
             raise Exception
     except Exception as e:

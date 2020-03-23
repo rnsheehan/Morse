@@ -35,12 +35,21 @@ if __name__ == '__main__':
 
     str_input = input('Enter a string to transmit:')
 
-    #morse_tx.convert_to_morse(str_input)
+    morse_output = morse_tx.convert_to_morse(str_input, True)
 
     # need to convert string to an array of words
     # split string using spaces
-    print(str_input.split(' '))
+    #print(str_input.split(' '))
     # need to convert word to an array of letters
     # split words using list
-    print("\n")
-    print(list(str_input))
+    #print("\n")
+    #print(list(str_input.upper()))
+
+    #string = "nlwnw*;akncakdkk?kdkjd*lwlw>27.3912"
+
+    #string = re.sub(r'[^\w]', '', string)
+
+    #print(string)
+
+    #print(re.search("[A-Z]",string))
+    #print(re.search("[0-9]",string))
