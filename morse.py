@@ -65,6 +65,6 @@ if __name__ == '__main__':
 
     morse_output = morse_tx.convert_to_morse(str_input, True)
 
-    morse_tx.morse_transmit(morse_output, False, False, True)
+    morse_tx.morse_transmit(morse_output, True, True, True)
 
     #sandbox()

@@ -82,14 +82,29 @@ def morse_transmit(message, add_prosigns = False, loop_message = False, loud = F
             dit_time = 0.5
             dah_time = 3.0*dit_time # dah = 3 dit
 
-            GPIO.setmode(GPIO.BOARD)
-            GPIO.setup(pin_no, GPIO.OUT)
-            
-            # loop over the letters in the message
-            for i in range(0, len(message), 1):
-                signals = message[i].split('-') # make a list of signals from the dit, dah that comprise each letter
-                signal_transmit(signals, dit_time, dah_time, pin_no, loud) # transmit the signal
-            GPIO.cleanup()
+            if add_prosigns:
+                # transmit the pro-signs before and after the message
+                signals = morse_code["ACHTUNG"].split('-')
+                signal_transmit(signals, dit_time, dah_time, pin_no, loud)
+
+            if loop_message:
+                # transmit the message multiple times by recursively calling morse_transmit without pro-signs etc
+                n_loops = 3
+                for k in range(0, n_loops, 1):
+                    morse_transmit(message, False, False, loud)
+            else:
+                # loop over the letters in the message once
+                for i in range(0, len(message), 1):
+                    signals = message[i].split('-') # make a list of signals from the dit, dah that comprise each letter
+                    signal_transmit(signals, dit_time, dah_time, pin_no, loud) # transmit the signal
+
+            if add_prosigns:
+                # transmit the pro-signs before and after the message
+                signals = morse_code["OVER"].split('-')
+                signal_transmit(signals, dit_time, dah_time, pin_no, loud)            
+                signals = morse_code["OUT"].split('-')
+                signal_transmit(signals, dit_time, dah_time, pin_no, loud)            
+
         else:
             ERR_STATEMENT = ERR_STATEMENT + "\n" + "message is None"
             raise Exception
@@ -110,6 +125,10 @@ def signal_transmit(signals, dit_time, dah_time, pin_no, loud = False):
         c3 = True if dah_time > dit_time else False
         c4 = c1 and c2 and c3
         if c4:
+
+            GPIO.setmode(GPIO.BOARD)
+            GPIO.setup(pin_no, GPIO.OUT)
+
             for j in range(0, len(signals), 1):
                 if signals[j] == 'dit':
                     # blink once
@@ -128,6 +147,9 @@ def signal_transmit(signals, dit_time, dah_time, pin_no, loud = False):
                 if loud: print("\tOff!")
                 GPIO.output(pin_no, False)
                 time.sleep(dit_time)
+
+            GPIO.cleanup()
+
         else:
             if c1 == False: ERR_STATEMENT = ERR_STATEMENT + "\n" + "signal is None"
             if c2 == False: ERR_STATEMENT = ERR_STATEMENT + "\n" + "dit_time < 0.0"
