@@ -59,9 +59,11 @@ def convert_to_morse(str_input, loud = False):
         print(ERR_STATEMENT)
         print(e)
 
-# method for transmitting the Morse signal
-def morse_transmit(message, loud = False):
-    # method tells the GPIO to blink to enable Morse code transmission
+
+def morse_transmit(message, add_prosigns = False, loop_message = False, loud = False):
+    # method for transmitting the Morse signal    
+    # method tells the GPIO to output a signal across a circuit
+    # circuit contains LED which blinks to enable Morse code transmission
     # R. Sheehan 24 - 3 - 2020
 
     FUNC_NAME = ".morse_transmit()"
@@ -69,10 +71,11 @@ def morse_transmit(message, loud = False):
 
     try:
         if message is not None:
-            # Add pro-signs to beginning and end of message
-            #message.insert(0, morse_code["ACHTUNG"])
-            #message.append(morse_code["OVER"])
-            #message.append(morse_code["OUT"])
+            if add_prosigns:
+                # Add pro-signs to beginning and end of message
+                message.insert(0, morse_code["ACHTUNG"])
+                message.append(morse_code["OVER"])
+                message.append(morse_code["OUT"])
             
             # set GPIO up to transmit
             pin_no = 11 # assign the pin from which the signal will be transmitted
@@ -85,27 +88,50 @@ def morse_transmit(message, loud = False):
             # loop over the letters in the message
             for i in range(0, len(message), 1):
                 signals = message[i].split('-') # make a list of signals from the dit, dah that comprise each letter
-                for j in range(0, len(signals), 1):
-                    if signals[j] == 'dit':
-                        # blink once
-                        if loud: print(signals[j])
-                        GPIO.output(pin_no, True)
-                        time.sleep(dit_time)
-                    elif signals[j] == 'dah':
-                        # long blink == three dit
-                        if loud: print(signals[j])
-                        GPIO.output(pin_no, True)
-                        time.sleep(dah_time)
-                    else:
-                        # do nothing
-                        pass
-                    # return-to-zero-between signals
-                    if loud: print("\tOff!")
-                    GPIO.output(pin_no, False)
-                    time.sleep(dit_time)
+                signal_transmit(signals, dit_time, dah_time, pin_no, loud) # transmit the signal
             GPIO.cleanup()
         else:
             ERR_STATEMENT = ERR_STATEMENT + "\n" + "message is None"
+            raise Exception
+    except Exception as e:
+        print(ERR_STATEMENT)
+        print(e)
+
+def signal_transmit(signals, dit_time, dah_time, pin_no, loud = False):
+    # method for transmitting a signal
+    # R. Sheehan 24 - 3 - 2020
+
+    FUNC_NAME = ".signal_transmit()"
+    ERR_STATEMENT = "Error: " + MOD_NAME_STR + FUNC_NAME
+
+    try:
+        c1 = True if signals is not None else False
+        c2 = True if dit_time > 0.0 else False
+        c3 = True if dah_time > dit_time else False
+        c4 = c1 and c2 and c3
+        if c4:
+            for j in range(0, len(signals), 1):
+                if signals[j] == 'dit':
+                    # blink once
+                    if loud: print(signals[j])
+                    GPIO.output(pin_no, True)
+                    time.sleep(dit_time)
+                elif signals[j] == 'dah':
+                    # long blink == three dit
+                    if loud: print(signals[j])
+                    GPIO.output(pin_no, True)
+                    time.sleep(dah_time)
+                else:
+                    # do nothing
+                    pass
+                # return-to-zero-between signals
+                if loud: print("\tOff!")
+                GPIO.output(pin_no, False)
+                time.sleep(dit_time)
+        else:
+            if c1 == False: ERR_STATEMENT = ERR_STATEMENT + "\n" + "signal is None"
+            if c2 == False: ERR_STATEMENT = ERR_STATEMENT + "\n" + "dit_time < 0.0"
+            if c3 == False: ERR_STATEMENT = ERR_STATEMENT + "\n" + "dah_time < dit_time"
             raise Exception
     except Exception as e:
         print(ERR_STATEMENT)
