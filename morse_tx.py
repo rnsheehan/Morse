@@ -4,8 +4,10 @@
 # en.wikipedia.org/wiki/Morse_Code
 # www.wikihow.com/Learn-Morse-Code
 
-import sys
-import re
+import sys # system commands
+import re # regex support
+import RPi.GPIO as GPIO # GPIO controls
+import time # time
 
 #sys.path.append('~/Programming/Python/Common/')
 #import Common
@@ -26,7 +28,10 @@ morse_code = {"A":"dit-dah", "B":"dah-dit-dit-dit","C":"dah-dit-dah-dit","D":"da
 
 # methods to enable the conversion
 def convert_to_morse(str_input, loud = False):
-    # method that converts a string to morse code
+    # method that converts the letters in a text string to morse code
+    # output is in the form of a list of characters in Morse code
+    # if the character is not in the Morse set it is ignored
+    # R. Sheehan 23 - 3 - 2020
     
     FUNC_NAME = ".convert_to_morse()"
     ERR_STATEMENT = "Error: " + MOD_NAME_STR + FUNC_NAME
@@ -47,6 +52,60 @@ def convert_to_morse(str_input, loud = False):
                     if loud: print(entry)
             return morse_list
         else:
+            ERR_STATEMENT = ERR_STATEMENT + "\n" + "str_input is None"
+            raise Exception
+            return None
+    except Exception as e:
+        print(ERR_STATEMENT)
+        print(e)
+
+# method for transmitting the Morse signal
+def morse_transmit(message, loud = False):
+    # method tells the GPIO to blink to enable Morse code transmission
+    # R. Sheehan 24 - 3 - 2020
+
+    FUNC_NAME = ".morse_transmit()"
+    ERR_STATEMENT = "Error: " + MOD_NAME_STR + FUNC_NAME
+
+    try:
+        if message is not None:
+            # Add pro-signs to beginning and end of message
+            #message.insert(0, morse_code["ACHTUNG"])
+            #message.append(morse_code["OVER"])
+            #message.append(morse_code["OUT"])
+            
+            # set GPIO up to transmit
+            pin_no = 11 # assign the pin from which the signal will be transmitted
+            dit_time = 0.5
+            dah_time = 3.0*dit_time # dah = 3 dit
+
+            GPIO.setmode(GPIO.BOARD)
+            GPIO.setup(pin_no, GPIO.OUT)
+            
+            # loop over the letters in the message
+            for i in range(0, len(message), 1):
+                signals = message[i].split('-') # make a list of signals from the dit, dah that comprise each letter
+                for j in range(0, len(signals), 1):
+                    if signals[j] == 'dit':
+                        # blink once
+                        if loud: print(signals[j])
+                        GPIO.output(pin_no, True)
+                        time.sleep(dit_time)
+                    elif signals[j] == 'dah':
+                        # long blink == three dit
+                        if loud: print(signals[j])
+                        GPIO.output(pin_no, True)
+                        time.sleep(dah_time)
+                    else:
+                        # do nothing
+                        pass
+                    # return-to-zero-between signals
+                    if loud: print("\tOff!")
+                    GPIO.output(pin_no, False)
+                    time.sleep(dit_time)
+            GPIO.cleanup()
+        else:
+            ERR_STATEMENT = ERR_STATEMENT + "\n" + "message is None"
             raise Exception
     except Exception as e:
         print(ERR_STATEMENT)

@@ -25,6 +25,8 @@ import morse_tx
 def sandbox():
     # space for testing random bits of code
     
+    str_input = "What God Hath Wrought"
+    
     # need to convert string to an array of words
     # split string using spaces
     print(str_input.split(' '))
@@ -41,6 +43,12 @@ def sandbox():
 
     print(re.search("[A-Z]",string))
     print(re.search("[0-9]",string))
+    print("\n")
+
+
+    #test_str = "dit-dit-dah-dah-dah-dit-dit"
+    test_str = ""
+    print(test_str.split('-'))
 
 def main():
     pass
@@ -56,3 +64,7 @@ if __name__ == '__main__':
     str_input = input('Enter a string to transmit:')
 
     morse_output = morse_tx.convert_to_morse(str_input, True)
+
+    morse_tx.morse_transmit(morse_output, True)
+
+    #sandbox()
